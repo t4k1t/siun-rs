@@ -1,7 +1,7 @@
 mod formatting;
 mod state;
 
-use clap::{Parser, Subcommand};
+use clap::{ArgAction, Parser, Subcommand};
 use formatting::{print_fancy, print_i3status, print_plain, OutputFormat};
 use state::{load_state_from_disk, State};
 
@@ -15,19 +15,35 @@ struct Cli {
 /// CLI sub commands
 #[derive(Subcommand)]
 enum Commands {
-    GetState {
+    Check {
         #[arg(short, long)]
         output_format: Option<OutputFormat>,
+        // NOTE: see https://jwodder.github.io/kbits/posts/clap-bool-negate/
+        #[arg(short, long, action = ArgAction::SetTrue, overrides_with = "_no_cache")]
+        cache: Option<bool>,
+        #[arg(short = 'n', long = "no-cache", action = ArgAction::SetFalse)]
+        _no_cache: Option<bool>,
+        #[arg(short = 'U', long, conflicts_with = "_no_cache", action = ArgAction::SetFalse)]
+        no_update: Option<bool>,
+        #[arg(short, long)]
+        quiet: Option<bool>,
     },
 }
 
 fn main() {
     let cli = Cli::parse();
 
-    let state: State = load_state_from_disk();
-
     match &cli.command {
-        Commands::GetState { output_format } => {
+        Commands::Check {
+            output_format,
+            cache,
+            _no_cache,
+            no_update,
+            quiet,
+        } => {
+            // TODO: Load config
+            let state: State = load_state_from_disk();
+
             match output_format {
                 &Some(OutputFormat::I3status) => {
                     print_i3status(state);

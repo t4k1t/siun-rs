@@ -36,10 +36,10 @@ fn main() {
     match &cli.command {
         Commands::Check {
             output_format,
-            cache,
+            cache: _,
             _no_cache,
-            no_update,
-            quiet,
+            no_update: _,
+            quiet: _,
         } => {
             // TODO: Load config
             let state: State = load_state_from_disk();

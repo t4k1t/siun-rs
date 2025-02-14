@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use serde_json::Value as JSONValue;
 use std::fs;
+use std::path::PathBuf;
 
 /// Representation of python types as serialized by siun
 #[derive(Serialize, Deserialize, Debug)]
@@ -39,9 +40,18 @@ pub fn load_state_from_disk() -> State {
         },
     };
 
-    let state_str = fs::read_to_string("/tmp/siun-state.json");
+    let state_path = xdg_state_home().join("state.json");
+    let state_str = fs::read_to_string(&state_path);
     match state_str {
         Ok(state_str) => serde_json::from_str(&state_str).expect("failed to parse state JSON"),
         Err(_) => default_state,
     }
+}
+
+fn xdg_state_home() -> PathBuf {
+    let state_path = std::env::var("XDG_STATE_HOME").unwrap_or(format!(
+        "{}/.local/state/siun",
+        std::env::var("HOME").unwrap_or_else(|_| "".to_string())
+    ));
+    PathBuf::from(&state_path)
 }

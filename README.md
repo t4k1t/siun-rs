@@ -9,3 +9,4 @@ Currently only reading of an `siun` state file is implemented.
 - [ ] Implement custom formatting
 - [ ] Implement criteria checks
 - [ ] Implement writing of state file
+- [ ] Load config
